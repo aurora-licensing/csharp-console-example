@@ -5,6 +5,7 @@ This repository contains a C# example implementation for interacting with the Au
 ## Requirements
 
 - .NET Framework 3.5 or later.
+- Newtonsoft.Json
 
 ## Getting Started
 
