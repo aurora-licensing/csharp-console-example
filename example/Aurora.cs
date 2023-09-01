@@ -374,6 +374,33 @@ public class Aurora
         }
     }
 
+    public void getIP(string licnese)
+     {
+        var parameters = new Dictionary<string, string>
+        {
+            { "action", "get_license_ip" },
+            { "name", name },
+            { "secret", secret },
+            { "hash", hash },
+            { "version", version },
+            { "license", licnese }
+        };
+
+        var response = SendGetRequest("/index.php", parameters);
+
+        // Deserialize JSON response
+        var jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+
+        if (jsonResponse.ContainsKey("error"))
+        {
+            info = new Response { valid = false, response = jsonResponse["error"] };
+        }
+        else
+        {
+            info = new Response { valid = true, response = jsonResponse["used_date"] };
+        }
+    }
+
     private string GetHwid()
     {
         return System.Security.Principal.WindowsIdentity.GetCurrent().User.Value;
