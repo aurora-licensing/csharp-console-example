@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -94,6 +94,52 @@ public class Aurora
             { "version", version },
             { "license", license },
             { "hwid", GetHwid() }
+        };
+
+        var response = SendGetRequest("/index.php", parameters);
+
+        // Deserialize JSON response
+        var jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+
+        if (jsonResponse.ContainsKey("error"))
+        {
+            info = new Response { valid = false, response = jsonResponse["error"] };
+        }
+        else
+        {
+            info = new Response { valid = true, response = jsonResponse["message"] };
+        }
+    }
+
+    public void CheckSession(string sessionId)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "action", "check_session" },
+            { "id", sessionId }
+        };
+
+        var response = SendGetRequest("/index.php", parameters);
+
+        // Deserialize JSON response
+        var jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+
+        if (jsonResponse.ContainsKey("error"))
+        {
+            info = new Response { valid = false, response = jsonResponse["error"] };
+        }
+        else
+        {
+            info = new Response { valid = true, response = jsonResponse["message"] };
+        }
+    }
+
+    public void KillSession(string sessionId)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "action", "kill_session" },
+            { "id", sessionId }
         };
 
         var response = SendGetRequest("/index.php", parameters);
@@ -374,7 +420,7 @@ public class Aurora
         }
     }
 
-    public void getIP(string licnese)
+     public void getIP(string licnese)
      {
         var parameters = new Dictionary<string, string>
         {
