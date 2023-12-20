@@ -282,6 +282,48 @@ public class Aurora
         }
     }
 
+    public byte[] UniqueDownloadToBytes(string license, string fileSecret)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "action", "unique_download" },
+            { "name", name },
+            { "secret", secret },
+            { "hash", hash },
+            { "version", version },
+            { "license", license },
+            { "file_name", fileSecret }
+        };
+
+        var response = SendGetRequest("/index.php", parameters);
+
+        // Deserialize JSON response
+        var jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+
+        if (jsonResponse.ContainsKey("error"))
+        {
+            info = new Response { valid = false, response = jsonResponse["error"] };
+            return null;
+        }
+
+        // Check if the response contains a valid download link
+        if (!jsonResponse.ContainsKey("download_link"))
+        {    
+            info = new Response { valid = false, response = "Invalid or missing download link in the response." };
+            return null;
+        }
+
+        var downloadLink = jsonResponse["download_link"];
+
+        using (var client = new HttpClient())
+        {
+            // Download the file as a byte array
+            var downloadResponse = client.GetAsync(downloadLink).Result;
+            downloadResponse.EnsureSuccessStatusCode();
+            return downloadResponse.Content.ReadAsByteArrayAsync().Result;
+        }
+    }
+
     public void SendWebhook(string botName, string iconUrl, string embedTitle, string message)
     {
         var parameters = new Dictionary<string, string>
